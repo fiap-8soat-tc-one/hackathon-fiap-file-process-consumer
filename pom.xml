@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.fiap.hackaton</groupId>
-    <artifactId>hackathon-fiap-file-process-consumer</artifactId>
+    <artifactId>file-process-consumer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>hackathon-fiap-file-process-consumer</name>
+    <name>file-process-consumer</name>
     <description>Fiap Hackaton 8SOAT file process engine consumer</description>
     <url/>
     <licenses>
