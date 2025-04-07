@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: file-process-consumer
+  profiles:
+    active: local
+
+  cloud:
+    aws:
+      sqs:
+        region: ${AWS_REGION:us-east-1}
+        endpoint: ${SQS_ENDPOINT:http://localhost:4566}
+
+      dynamodb:
+        region: ${AWS_REGION:us-east-1}
+        endpoint: ${DYNAMO_DB_ENDPOINT:http://localhost:4566}
+        table-prefix: fiap-hackaton-
+      s3:
+        region: ${AWS_REGION:us-east-1}
+        endpoint: ${S3_ENDPOINT:http://localhost:4566}
+app:
+  message-broker:
+    event:
+      upload:
+        queue-name: upload-event-queue
+      notification:
+        queue-name: notification-event-queue
