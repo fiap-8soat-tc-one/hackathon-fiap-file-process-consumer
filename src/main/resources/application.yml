@@ -8,15 +8,15 @@ spring:
     aws:
       sqs:
         region: ${AWS_REGION:us-east-1}
-        endpoint: ${SQS_ENDPOINT:http://localhost:4566}
+        endpoint: ${SQS_ENDPOINT:https://localhost.localstack.cloud:4566}
 
       dynamodb:
         region: ${AWS_REGION:us-east-1}
-        endpoint: ${DYNAMO_DB_ENDPOINT:http://localhost:4566}
+        endpoint: ${DYNAMO_DB_ENDPOINT:https://localhost.localstack.cloud:4566}
         table-prefix: fiap-hackaton-
       s3:
         region: ${AWS_REGION:us-east-1}
-        endpoint: ${S3_ENDPOINT:http://localhost:4566}
+        endpoint: ${S3_ENDPOINT:https://localhost.localstack.cloud:4566}
 app:
   message-broker:
     event:
@@ -24,3 +24,5 @@ app:
         queue-name: upload-event-queue
       notification:
         queue-name: notification-event-queue
+  storage:
+    bucket: bucket-fiap-hackaton-t32-files

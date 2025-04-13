@@ -3,7 +3,7 @@ version: '3.8'
 services:
   localstack:
     container_name: "${LOCALSTACK_DOCKER_NAME-localstack-hackaton}"
-    image: localstack/localstack
+    image: localstack/localstack:4.0.3
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway https://app.localstack.cloud
       - "127.0.0.1:4510-4559:4510-4559"  # external services port range
@@ -13,8 +13,11 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-fakeSecretAccessKey}
       - DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
       - MAIN_CONTAINER_NAME=${LOCALSTACK_DOCKER_NAME-localstack-hackaton}
+      - PERSISTENCE=1
+      - DATA_DIR=/var/lib/localstack/data
     volumes:
-      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - ./scripts/init-resources.sh:/etc/localstack/init/ready.d/init-resources.sh
+      - localstack_data:/var/lib/localstack
       - "/var/run/docker.sock:/var/run/docker.sock"
     healthcheck:
       test: [ "CMD-SHELL", "curl -s http://localhost:4566 > /dev/null 2>&1 || exit 1" ]
@@ -24,13 +27,13 @@ services:
     networks:
       - localstack-network
 
-  hackaton-file-process-consumer:
+  file-process-consumer-app:
     depends_on:
       localstack:
         condition: service_healthy
     build:
       context: .
-    container_name: hackaton-file-process-consumer
+    container_name: file-process-consumer-app
     ports:
       - 8080:8080
     restart: always
@@ -49,3 +52,6 @@ services:
 networks:
   localstack-network:
     driver: bridge
+volumes:
+  localstack_data:
+    external: false

@@ -1,31 +1,29 @@
-package com.fiap.hackaton.service;
+package com.fiap.hackaton.database.repositories;
 
 import com.fiap.hackaton.database.entity.Uploads;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.util.Objects;
+import java.util.Optional;
 
-@Service
+@Repository
 @RequiredArgsConstructor
-public class UploadService {
-    private final DynamoDbClient dynamoDbClient;
+public class UploadsRepository {
     private final DynamoDbTemplate dynamoDbTemplate;
 
-    public void findById(String id) {
+    public Optional<Uploads> findById(String id) {
         Key key = Key.builder().partitionValue(id).build();
         Uploads uploadEntity = dynamoDbTemplate.load(key, Uploads.class);
         if (Objects.nonNull(uploadEntity)) {
-            uploadEntity.setStatusUpload("complete");
-            uploadEntity = dynamoDbTemplate.save(uploadEntity);
-            System.out.println("UploadEntity: " + uploadEntity);
-
+            return Optional.of(uploadEntity);
         }
-
-
+        return Optional.empty();
     }
 
+    public Uploads save(Uploads uploadEntity) {
+        return dynamoDbTemplate.save(uploadEntity);
+    }
 }

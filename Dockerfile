@@ -17,5 +17,5 @@ LABEL org.opencontainers.image.licenses="GNU General Public License v3.0"
 
 
 WORKDIR /app
-COPY --from=build /app/target/*.jar /app/hackaton-file-process-consumer.jar
-ENTRYPOINT ["java", "-jar", "hackaton-file-process-consumer.jar"]
+COPY --from=build /app/target/*.jar /app/file-process-consumer.jar
+ENTRYPOINT ["java", "-jar", "file-process-consumer.jar"]
