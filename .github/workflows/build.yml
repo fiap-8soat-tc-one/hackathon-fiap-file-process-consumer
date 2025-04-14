@@ -33,7 +33,7 @@ jobs:
           cache: 'maven'
       
       - name: Build and analyze
-        working-directory: ./src
+        working-directory: ./
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
