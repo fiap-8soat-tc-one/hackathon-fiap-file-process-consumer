@@ -1,4 +1,4 @@
-package com.fiap.hackaton.broker.publisher;
+package com.fiap.hackaton.infrastructure.presentation.workers.publishers;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.support.MessageBuilder;

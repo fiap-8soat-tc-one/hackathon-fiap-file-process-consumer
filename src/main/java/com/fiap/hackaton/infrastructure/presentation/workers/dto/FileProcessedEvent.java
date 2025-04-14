@@ -1,4 +1,4 @@
-package com.fiap.hackaton.broker.dto;
+package com.fiap.hackaton.infrastructure.presentation.workers.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

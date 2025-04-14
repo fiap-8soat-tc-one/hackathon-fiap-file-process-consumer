@@ -1,4 +1,4 @@
-package com.fiap.hackaton.broker.publisher;
+package com.fiap.hackaton.infrastructure.presentation.workers.publishers;
 
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import lombok.AllArgsConstructor;

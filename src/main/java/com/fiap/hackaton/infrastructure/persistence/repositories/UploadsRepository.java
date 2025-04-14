@@ -1,6 +1,6 @@
-package com.fiap.hackaton.database.repositories;
+package com.fiap.hackaton.infrastructure.persistence.repositories;
 
-import com.fiap.hackaton.database.entity.Uploads;
+import com.fiap.hackaton.infrastructure.persistence.entities.Uploads;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

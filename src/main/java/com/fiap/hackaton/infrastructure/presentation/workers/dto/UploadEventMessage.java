@@ -1,4 +1,4 @@
-package com.fiap.hackaton.broker.dto;
+package com.fiap.hackaton.infrastructure.presentation.workers.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
