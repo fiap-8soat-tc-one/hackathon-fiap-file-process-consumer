@@ -1,4 +1,4 @@
-package com.fiap.hackaton.service;
+package com.fiap.hackaton.infrastructure.services;
 
 import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Resource;

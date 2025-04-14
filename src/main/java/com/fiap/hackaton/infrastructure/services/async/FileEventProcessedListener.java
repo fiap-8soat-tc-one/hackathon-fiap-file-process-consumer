@@ -1,6 +1,6 @@
-package com.fiap.hackaton.service.async;
+package com.fiap.hackaton.infrastructure.services.async;
 
-import com.fiap.hackaton.broker.dto.FileProcessedEvent;
+import com.fiap.hackaton.infrastructure.presentation.workers.dto.FileProcessedEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

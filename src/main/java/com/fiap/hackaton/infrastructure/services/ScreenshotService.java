@@ -1,4 +1,4 @@
-package com.fiap.hackaton.service;
+package com.fiap.hackaton.infrastructure.services;
 
 import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.zip.ZipOutputStream;
 public class ScreenshotService {
 
     private final StorageClientService storageClientService;
-    private final FileProcessedEventService fileProcessedEventService;
+    private final RemoveAsyncFileProcessedEventService removeAsyncFileProcessedEventService;
 
     @SneakyThrows
     public String generate(String fileName) {
@@ -76,7 +76,7 @@ public class ScreenshotService {
                         storageResource = storageClientService.upload(zipFile.getName(), zipFileIs,
                                 "application/zip");
                     }
-                    fileProcessedEventService.emitEvent(List.of(tempFile, zipFile.toPath()));
+                    removeAsyncFileProcessedEventService.emitEvent(List.of(tempFile, zipFile.toPath()));
 
 
                     return storageResource.getURI().toString();

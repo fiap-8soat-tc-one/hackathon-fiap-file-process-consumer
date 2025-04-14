@@ -1,4 +1,4 @@
-package com.fiap.hackaton.database.entity;
+package com.fiap.hackaton.infrastructure.persistence.entities;
 
 
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.fiap.hackaton.config;
+package com.fiap.hackaton.infrastructure.core.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
