@@ -21,9 +21,12 @@ public class UploadService {
             .orElseThrow(() -> new NotFoundException(format("Upload record not found for id: %s", id)));
     }
 
-    public void updateUploadStatus(Uploads upload, String urlDownload) {
-        upload.setStatus(UploadStatus.PROCESSED.name());
-        upload.setUrlDownload(urlDownload);
+    public void updateUploadStatus(Uploads upload, String urlDownload, UploadStatus status) {
+        upload.setStatus(status.name());
+
+        if(!urlDownload.isEmpty())
+            upload.setUrlDownload(urlDownload);
+
         uploadsRepository.save(upload);
     }
 }

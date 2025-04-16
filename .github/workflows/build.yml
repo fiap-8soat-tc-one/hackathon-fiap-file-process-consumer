@@ -14,12 +14,12 @@ env:
   ECR_REGISTRY: 913524932573.dkr.ecr.us-east-1.amazonaws.com
   JAVA_VERSION: 21
   JAVA_DISTRIBUTION: 'zulu'
+  EKS_CLUSTER_NAME: eks-fiap-cluster
 
 jobs:
   sonar-analysis:
     name: Run Sonar Analysis
     runs-on: ubuntu-latest
-    environment: staging
 
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +46,6 @@ jobs:
     name: Build&Push Image
     needs: sonar-analysis
     runs-on: ubuntu-latest
-    environment: staging
 
     steps:
       - uses: actions/checkout@v4
@@ -79,3 +78,29 @@ jobs:
           
           docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
           docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${VERSION_TAG}
+
+  deploy-eks:
+    name: Deploy to EKS
+    needs: push-ecr
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Update kube config
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+      - name: Deploy to EKS
+        run: |
+          kubectl apply -f k8sdeploy.yaml

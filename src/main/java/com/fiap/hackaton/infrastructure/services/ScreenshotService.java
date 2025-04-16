@@ -31,7 +31,7 @@ public class ScreenshotService {
     @Value("${app.screenshot.image-format:png}")
     private String imageFormat;
 
-    public String generate(String fileName) {
+    public String generate(String fileName) throws Exception {
         try {
             String decodedFileName = decodeFileName(fileName);
             Path videoFile = downloadVideo(decodedFileName);
@@ -41,7 +41,7 @@ public class ScreenshotService {
             return zipUrl;
         } catch (Exception e) {
             log.error("Error processing video screenshots for file: {}", fileName, e);
-            throw new RuntimeException("Failed to process video screenshots", e);
+            throw new Exception ("Failed to process video screenshots", e);
         }
     }
 

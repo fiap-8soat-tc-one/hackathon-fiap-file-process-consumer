@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: app-hackaton-backend
-          image: '913524932573.dkr.ecr.us-east-1.amazonaws.com/file-engine-repo:latest'
+          image: 913524932573.dkr.ecr.us-east-1.amazonaws.com/file-engine-repo:latest
           ports:
             - name: http
               containerPort: 8080

@@ -1,6 +1,7 @@
 package com.fiap.hackaton.infrastructure.gateways.core.config;
 
 import com.fiap.hackaton.application.gateways.ProcessFileUploadSpec;
+import com.fiap.hackaton.domain.enums.UploadStatus;
 import com.fiap.hackaton.infrastructure.services.NotificationEventService;
 import com.fiap.hackaton.infrastructure.services.ScreenshotService;
 import com.fiap.hackaton.infrastructure.services.UploadService;
@@ -36,11 +37,14 @@ public class ProcessFileUploadGateway implements ProcessFileUploadSpec {
             var uploadEntity = uploadService.findById(fileNameWithoutExtension);
             var urlDownload = screenshotService.generate(key);
             
-            uploadService.updateUploadStatus(uploadEntity, urlDownload);
+            uploadService.updateUploadStatus(uploadEntity, urlDownload, UploadStatus.PROCESSED);
             notificationEventService.notifySuccess(fileNameWithoutExtension, uploadEntity.getStatus());
             
             log.info("Finished processing video: {}", fileName);
         } catch (Exception e) {
+            log.error("Error processing video: {}", fileName, e);
+            var uploadEntity = uploadService.findById(fileNameWithoutExtension);
+            uploadService.updateUploadStatus(uploadEntity, "", UploadStatus.ERROR);
             notificationEventService.notifyError(fileNameWithoutExtension, e.getMessage());
         }
     }
