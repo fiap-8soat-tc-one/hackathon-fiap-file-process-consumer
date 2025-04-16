@@ -126,10 +126,7 @@ public class ScreenshotService {
         String zipName = "zips/" + UUID.randomUUID() + ".zip";
 
         try (InputStream zipFileIs = new BufferedInputStream(Files.newInputStream(zipFile))) {
-            S3Resource storageResource = storageClientService.upload(zipName, zipFileIs, "application/zip");
-            String uploadedUrl = storageResource.getURI().toString();
-            log.info("Successfully uploaded zip file: {}", zipName);
-            return uploadedUrl;
+            return storageClientService.upload(zipName, zipFileIs, "application/zip");
         }
     }
 }
