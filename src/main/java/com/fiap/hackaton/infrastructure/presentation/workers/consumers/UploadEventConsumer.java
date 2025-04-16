@@ -17,7 +17,11 @@ public class UploadEventConsumer {
     @SqsListener("${app.message-broker.event.upload.queue-name}")
     public void listen(@Payload UploadEventMessage message) {
         log.info("Upload event message received: {}", message);
-        var key = message.getRecords().getFirst().getS3().getObject().getKey();
-        processFileUploadUseCase.execute(key);
+
+        message.getRecords().forEach(record -> {
+            var key = record.getS3().getObject().getKey();
+            log.info("file-key: {}", key);
+            processFileUploadUseCase.execute(key);
+        });
     }
 }

@@ -2,11 +2,11 @@ package com.fiap.hackaton.infrastructure.services;
 
 import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -14,7 +14,6 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -25,65 +24,112 @@ import java.util.zip.ZipOutputStream;
 public class ScreenshotService {
 
     private final StorageClientService storageClientService;
-    private final RemoveAsyncFileProcessedEventService removeAsyncFileProcessedEventService;
 
-    @SneakyThrows
+    @Value("${app.screenshot.total-frames:5}")
+    private int totalFrames;
+
+    @Value("${app.screenshot.image-format:png}")
+    private String imageFormat;
+
     public String generate(String fileName) {
-        try (var video = storageClientService.download(fileName)) {
-            log.info("Starting get screenshots from video: {}", fileName);
-            Path tempFile = Files.createTempFile("video-", ".mp4");
-            try (OutputStream out = new FileOutputStream(tempFile.toFile())) {
-                video.transferTo(out);
-            }
-            int totalFrames = 5;
-
-            try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(tempFile.toFile())) {
-                grabber.start();
-                Java2DFrameConverter converter = new Java2DFrameConverter();
-                long durationMicros = grabber.getLengthInTime();
-                double durationSeconds = durationMicros / 1_000_000.0;
-                Integer time = (int) Math.round((durationSeconds));
-                log.info("Duration: {} seconds", time);
-                int intervalSeconds = (int) Math.round((durationSeconds / totalFrames));
-                File zipFile = new File(UUID.randomUUID() + ".zip");
-                zipFile.deleteOnExit();
-                try (FileOutputStream fos = new FileOutputStream(zipFile);
-                     ZipOutputStream zipOut = new ZipOutputStream(fos)) {
-                    for (int i = 0; i < totalFrames; i++) {
-
-                        long timestampMicros = i * intervalSeconds * 1_000_000L;
-                        grabber.setTimestamp(timestampMicros);
-
-                        Frame frame = grabber.grabImage();
-                        if (frame == null) break;
-
-                        BufferedImage image = converter.convert(frame);
-                        String entryName = UUID.randomUUID() + "_" + (i + 1) + ".png";
-                        zipOut.putNextEntry(new ZipEntry(entryName));
-                        ByteArrayOutputStream imgOut = new ByteArrayOutputStream();
-                        ImageIO.write(image, "png", imgOut);
-                        zipOut.write(imgOut.toByteArray());
-
-                        zipOut.closeEntry();
-                        log.info("Frame added to zip: {}", entryName);
-
-
-                    }
-
-                    grabber.stop();
-                    S3Resource storageResource;
-                    try (var zipFileIs = new FileInputStream(zipFile)) {
-                        storageResource = storageClientService.upload(zipFile.getName(), zipFileIs,
-                                "application/zip");
-                    }
-                    removeAsyncFileProcessedEventService.emitEvent(List.of(tempFile, zipFile.toPath()));
-
-
-                    return storageResource.getURI().toString();
-                }
-
-            }
+        try {
+            String decodedFileName = decodeFileName(fileName);
+            Path videoFile = downloadVideo(decodedFileName);
+            Path zipFile = generateScreenshots(videoFile);
+            String zipUrl = uploadZipFile(zipFile);
+            cleanupVideo(fileName);
+            return zipUrl;
+        } catch (Exception e) {
+            log.error("Error processing video screenshots for file: {}", fileName, e);
+            throw new RuntimeException("Failed to process video screenshots", e);
         }
     }
 
+    private void cleanupVideo(String fileName) {
+        storageClientService.remove(fileName);
+    }
+
+    private String decodeFileName(String fileName) {
+        return fileName.replace("%40", "@");
+    }
+
+    private Path downloadVideo(String fileName) throws IOException {
+        log.info("Downloading video: {}", fileName);
+        Path tempFile = Files.createTempFile("video-", ".mp4");
+        try (InputStream video = storageClientService.download(fileName);
+             OutputStream out = Files.newOutputStream(tempFile)) {
+            video.transferTo(out);
+        }
+        return tempFile;
+    }
+
+    private Path generateScreenshots(Path videoFile) throws IOException {
+        log.info("Generating screenshots from video");
+        Path zipFile = Files.createTempFile("screenshots-", ".zip");
+
+        try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoFile.toFile());
+             BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(zipFile));
+             ZipOutputStream zipOut = new ZipOutputStream(bos)) {
+
+            grabber.start();
+            Java2DFrameConverter converter = new Java2DFrameConverter();
+            double durationSeconds = grabber.getLengthInTime() / 1_000_000.0;
+            int intervalSeconds = (int) Math.round(durationSeconds / totalFrames);
+
+            log.info("Video duration: {} seconds, interval: {} seconds", durationSeconds, intervalSeconds);
+
+            for (int i = 0; i < totalFrames; i++) {
+                addFrameToZip(grabber, converter, zipOut, i, intervalSeconds);
+            }
+
+            zipOut.flush();
+        }
+
+        return zipFile;
+    }
+
+    private void addFrameToZip(FFmpegFrameGrabber grabber, Java2DFrameConverter converter,
+                               ZipOutputStream zipOut, int frameIndex, int intervalSeconds) throws IOException {
+        long timestampMicros = frameIndex * intervalSeconds * 1_000_000L;
+        grabber.setTimestamp(timestampMicros);
+
+        Frame frame = grabber.grabImage();
+        if (frame == null) {
+            log.warn("No frame available at timestamp: {}", timestampMicros);
+            return;
+        }
+
+        BufferedImage image = converter.convert(frame);
+        if (image == null) {
+            log.warn("Could not convert frame at timestamp: {}", timestampMicros);
+            return;
+        }
+
+        String entryName = String.format("frame_%d.%s", (frameIndex + 1), imageFormat);
+        zipOut.putNextEntry(new ZipEntry(entryName));
+
+        try (ByteArrayOutputStream imgOut = new ByteArrayOutputStream()) {
+            if (!ImageIO.write(image, imageFormat, imgOut)) {
+                log.warn("No writer found for image format: {}", imageFormat);
+                return;
+            }
+            byte[] imageBytes = imgOut.toByteArray();
+            zipOut.write(imageBytes, 0, imageBytes.length);
+        }
+
+        zipOut.closeEntry();
+        log.debug("Added frame to zip: {}", entryName);
+    }
+
+    private String uploadZipFile(Path zipFile) throws IOException {
+        log.info("Uploading zip file to storage");
+        String zipName = "zips/" + UUID.randomUUID() + ".zip";
+
+        try (InputStream zipFileIs = new BufferedInputStream(Files.newInputStream(zipFile))) {
+            S3Resource storageResource = storageClientService.upload(zipName, zipFileIs, "application/zip");
+            String uploadedUrl = storageResource.getURI().toString();
+            log.info("Successfully uploaded zip file: {}", zipName);
+            return uploadedUrl;
+        }
+    }
 }

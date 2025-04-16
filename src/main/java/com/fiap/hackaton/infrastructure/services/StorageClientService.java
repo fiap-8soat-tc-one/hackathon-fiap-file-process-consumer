@@ -39,7 +39,10 @@ public class StorageClientService {
 
         return s3Template.upload(bucketName, fileName, file,
                 ObjectMetadata.builder().contentType(contentType).build());
-
     }
 
+    @SneakyThrows
+    public void remove(String fileName) {
+        s3Client.deleteObject(builder -> builder.bucket(bucketName).key(fileName));
+    }
 }

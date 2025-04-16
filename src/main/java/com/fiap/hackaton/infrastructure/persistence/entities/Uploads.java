@@ -7,23 +7,26 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttri
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
+import java.time.Instant;
+import java.util.UUID;
+
 @Setter
 @DynamoDbBean
 @ToString
 public class Uploads {
-    private String id;
+    private UUID id;
 
     private String email;
 
-    private String statusUpload;
+    private String status;
 
     private String urlDownload;
 
-    private String dataCriacao;
+    private Instant createdAt;
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("id")
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -33,8 +36,8 @@ public class Uploads {
     }
 
     @DynamoDbAttribute("status_upload")
-    public String getStatusUpload() {
-        return statusUpload;
+    public String getStatus() {
+        return status;
     }
 
     @DynamoDbAttribute("url_download")
@@ -43,8 +46,8 @@ public class Uploads {
     }
 
     @DynamoDbAttribute("data_criacao")
-    public String getDataCriacao() {
-        return dataCriacao;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
 }

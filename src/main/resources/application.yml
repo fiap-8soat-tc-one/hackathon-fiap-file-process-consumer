@@ -1,22 +1,21 @@
 spring:
   application:
     name: file-process-consumer
-  profiles:
-    active: local
-
+  #  profiles:
+  #    active: local
   cloud:
     aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region:
+        static: ${AWS_REGION}
       sqs:
-        region: ${AWS_REGION:us-east-1}
-        endpoint: ${SQS_ENDPOINT:https://localhost.localstack.cloud:4566}
+        endpoint: ${SQS_ENDPOINT}
 
       dynamodb:
-        region: ${AWS_REGION:us-east-1}
-        endpoint: ${DYNAMO_DB_ENDPOINT:https://localhost.localstack.cloud:4566}
+        endpoint: ${DYNAMO_DB_ENDPOINT}
         table-prefix: fiap-hackaton-
-      s3:
-        region: ${AWS_REGION:us-east-1}
-        endpoint: ${S3_ENDPOINT:https://localhost.localstack.cloud:4566}
 app:
   message-broker:
     event:

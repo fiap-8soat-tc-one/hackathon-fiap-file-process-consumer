@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class EventPublisher<T> {
+public class EventPublisher {
     private final SqsTemplate sqsTemplate;
 
-    public void send(String queueName, Message<T> message) {
+    public void send(String queueName, Message<Object> message) {
         sqsTemplate.send(queueName, message);
         log.info("Queue name: {} Sent message: {}", queueName, message);
     }

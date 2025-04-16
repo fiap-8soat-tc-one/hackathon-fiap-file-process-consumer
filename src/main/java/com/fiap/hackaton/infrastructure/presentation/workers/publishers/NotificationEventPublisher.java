@@ -18,5 +18,4 @@ public class NotificationEventPublisher {
     public void send(Object message) {
         eventPublisher.send(queueName, MessageBuilder.withPayload(message).build());
     }
-
 }
