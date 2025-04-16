@@ -23,7 +23,7 @@ public class UploadsRepository {
         return Optional.empty();
     }
 
-    public Uploads save(Uploads uploadEntity) {
-        return dynamoDbTemplate.save(uploadEntity);
+    public void save(Uploads uploadEntity) {
+        dynamoDbTemplate.save(uploadEntity);
     }
 }
