@@ -11,7 +11,7 @@
     <groupId>com.fiap.hackaton</groupId>
     <artifactId>file-process-consumer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>file-process-consumer</name>
+    <name>hackathon-fiap-file-process-consumer</name>
     <description>Fiap Hackaton 8SOAT file process engine consumer</description>
     <url/>
     <licenses>
