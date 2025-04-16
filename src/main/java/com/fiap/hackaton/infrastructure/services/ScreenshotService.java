@@ -1,6 +1,5 @@
 package com.fiap.hackaton.infrastructure.services;
 
-import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
