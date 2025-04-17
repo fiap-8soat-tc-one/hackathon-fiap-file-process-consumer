@@ -1,4 +1,4 @@
-package com.fiap.hackaton.infrastructure.gateways.core.config;
+package com.fiap.hackaton.infrastructure.gateways;
 
 import com.fiap.hackaton.application.gateways.ProcessFileUploadSpec;
 import com.fiap.hackaton.domain.enums.UploadStatus;

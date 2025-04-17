@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: file-process-consumer
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region:
+        static: ${AWS_REGION}
+      sqs:
+        endpoint: ${SQS_ENDPOINT}
+      dynamodb:
+        endpoint: ${DYNAMO_DB_ENDPOINT}
+        table-prefix: fiap-hackaton-
+app:
+  message-broker:
+    event:
+      upload:
+        queue-name: upload-event-queue
+      notification:
+        queue-name: notification-event-queue
+  storage:
+    bucket: bucket-fiap-hackaton-t32-files

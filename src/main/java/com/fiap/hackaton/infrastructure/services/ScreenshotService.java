@@ -33,6 +33,7 @@ public class ScreenshotService {
     public String generate(String fileName) throws Exception {
         try {
             String decodedFileName = decodeFileName(fileName);
+            log.info("Decoded file name: {}", decodedFileName);
             Path videoFile = downloadVideo(decodedFileName);
             Path zipFile = generateScreenshots(videoFile);
             String zipUrl = uploadZipFile(zipFile);
@@ -40,7 +41,7 @@ public class ScreenshotService {
             return zipUrl;
         } catch (Exception e) {
             log.error("Error processing video screenshots for file: {}", fileName, e);
-            throw new Exception ("Failed to process video screenshots", e);
+            throw new Exception("Failed to process video screenshots", e);
         }
     }
 

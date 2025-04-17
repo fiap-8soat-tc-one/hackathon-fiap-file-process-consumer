@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: file-process-consumer
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID:fakeAccessKeyId}
+        secret-key: ${AWS_SECRET_ACCESS_KEY:fakeSecretAccessKey}
+      region:
+        static: ${AWS_REGION:us-east-1}
+      sqs:
+        endpoint: ${SQS_ENDPOINT:http://localhost:4566}
+
+      dynamodb:
+        endpoint: ${DYNAMO_DB_ENDPOINT:http://localhost:4566}
+        table-prefix: fiap-hackaton-
+      s3:
+        endpoint: ${S3_ENDPOINT:http://localhost:4566}
+app:
+  message-broker:
+    event:
+      upload:
+        queue-name: upload-event-queue
+      notification:
+        queue-name: notification-event-queue
+  storage:
+    bucket: bucket-fiap-hackaton-t32-files

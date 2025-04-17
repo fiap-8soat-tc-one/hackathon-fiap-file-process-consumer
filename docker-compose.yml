@@ -16,7 +16,7 @@ services:
       - PERSISTENCE=1
       - DATA_DIR=/var/lib/localstack/data
     volumes:
-      - ./scripts/init-resources.sh:/etc/localstack/init/ready.d/init-resources.sh
+      - ./scripts:/etc/localstack/init/ready.d
       - localstack_data:/var/lib/localstack
       - "/var/run/docker.sock:/var/run/docker.sock"
     healthcheck:
@@ -38,6 +38,7 @@ services:
       - 8080:8080
     restart: always
     environment:
+      - SPRING_PROFILES_ACTIVE=local
       - AWS_REGION=${AWS_REGION:-us-east-1}
       - DYNAMO_DB_ENDPOINT=http://localstack:4566
       - SQS_ENDPOINT=http://localstack:4566
