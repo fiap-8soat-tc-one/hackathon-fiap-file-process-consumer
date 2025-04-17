@@ -1,8 +1,6 @@
 spring:
   application:
     name: file-process-consumer
-  #  profiles:
-  #    active: local
   cloud:
     aws:
       credentials:
@@ -12,7 +10,6 @@ spring:
         static: ${AWS_REGION}
       sqs:
         endpoint: ${SQS_ENDPOINT}
-
       dynamodb:
         endpoint: ${DYNAMO_DB_ENDPOINT}
         table-prefix: fiap-hackaton-
