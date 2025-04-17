@@ -13,7 +13,7 @@ import static java.lang.String.format;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UploadService {
+public class UploadDbService {
     private final UploadsRepository uploadsRepository;
 
     public Uploads findById(String id) {

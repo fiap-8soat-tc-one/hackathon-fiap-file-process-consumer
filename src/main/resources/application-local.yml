@@ -16,12 +16,3 @@ spring:
         table-prefix: fiap-hackaton-
       s3:
         endpoint: ${S3_ENDPOINT:http://localhost:4566}
-app:
-  message-broker:
-    event:
-      upload:
-        queue-name: upload-event-queue
-      notification:
-        queue-name: notification-event-queue
-  storage:
-    bucket: bucket-fiap-hackaton-t32-files

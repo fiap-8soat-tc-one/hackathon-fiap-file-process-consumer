@@ -1,3 +1,14 @@
 spring:
   profiles:
     active: prod
+app:
+  message-broker:
+    event:
+      upload:
+        queue-name: upload-event-queue
+      notification:
+        queue-name: notification-event-queue
+  storage:
+    bucket: bucket-fiap-hackaton-t32-files
+    pre-signed-url:
+      ttl-in-hour: 24

@@ -4,7 +4,7 @@ import com.fiap.hackaton.application.gateways.ProcessFileUploadSpec;
 import com.fiap.hackaton.domain.enums.UploadStatus;
 import com.fiap.hackaton.infrastructure.services.NotificationEventService;
 import com.fiap.hackaton.infrastructure.services.ScreenshotService;
-import com.fiap.hackaton.infrastructure.services.UploadService;
+import com.fiap.hackaton.infrastructure.services.UploadDbService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProcessFileUploadGateway implements ProcessFileUploadSpec {
     private final NotificationEventService notificationEventService;
-    private final UploadService uploadService;
+    private final UploadDbService uploadService;
     private final ScreenshotService screenshotService;
 
     @Override
     public void execute(String key) {
-        if(key.toLowerCase().startsWith("zip")) {
+        if (key.toLowerCase().startsWith("zip")) {
             log.info("Ignoring zip file");
             return;
         }
@@ -30,22 +30,30 @@ public class ProcessFileUploadGateway implements ProcessFileUploadSpec {
             return;
         }
 
-        var fileName = key.split("/")[2];
-        var fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+        var fileName = extractFileNameWithoutExtension(key);
+
 
         try {
-            var uploadEntity = uploadService.findById(fileNameWithoutExtension);
+            var uploadEntity = uploadService.findById(fileName);
             var urlDownload = screenshotService.generate(key);
-            
+
             uploadService.updateUploadStatus(uploadEntity, urlDownload, UploadStatus.PROCESSED);
-            notificationEventService.notifySuccess(fileNameWithoutExtension, uploadEntity.getStatus());
-            
+            notificationEventService.notifySuccess(fileName, uploadEntity.getStatus());
+
             log.info("Finished processing video: {}", fileName);
         } catch (Exception e) {
             log.error("Error processing video: {}", fileName, e);
-            var uploadEntity = uploadService.findById(fileNameWithoutExtension);
+            var uploadEntity = uploadService.findById(fileName);
             uploadService.updateUploadStatus(uploadEntity, "", UploadStatus.ERROR);
-            notificationEventService.notifyError(fileNameWithoutExtension, e.getMessage());
+            notificationEventService.notifyError(fileName, e.getMessage());
         }
+    }
+
+    private String extractFileNameWithoutExtension(String key) {
+        String[] segments = key.split("/");
+        if (segments.length > 2) {
+            return (segments[2]).substring(0, key.lastIndexOf('.'));
+        }
+        return key.substring(0, key.lastIndexOf('.'));
     }
 }

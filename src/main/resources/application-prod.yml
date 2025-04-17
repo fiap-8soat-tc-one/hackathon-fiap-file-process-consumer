@@ -13,12 +13,3 @@ spring:
       dynamodb:
         endpoint: ${DYNAMO_DB_ENDPOINT}
         table-prefix: fiap-hackaton-
-app:
-  message-broker:
-    event:
-      upload:
-        queue-name: upload-event-queue
-      notification:
-        queue-name: notification-event-queue
-  storage:
-    bucket: bucket-fiap-hackaton-t32-files

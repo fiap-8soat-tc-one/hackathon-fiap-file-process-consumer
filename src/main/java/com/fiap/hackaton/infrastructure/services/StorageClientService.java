@@ -21,13 +21,16 @@ public class StorageClientService {
     private final S3Template s3Template;
     private final String bucketName;
     private final S3Presigner s3Presigner;
+    private final Integer presignUrlDuration;
 
     public StorageClientService(S3Client s3Client, S3Template s3Template, S3Presigner s3Presigner,
-                                @Value("${app.storage.bucket}") String bucketName) {
+                                @Value("${app.storage.bucket}") String bucketName,
+                                @Value("${app.storage.pre-signed-url.ttl-in-hour}") Integer presignUrlDuration) {
         this.s3Client = s3Client;
         this.s3Template = s3Template;
         this.bucketName = bucketName;
         this.s3Presigner = s3Presigner;
+        this.presignUrlDuration = presignUrlDuration;
     }
 
     @SneakyThrows
@@ -49,7 +52,7 @@ public class StorageClientService {
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofHours(24))
+                .signatureDuration(Duration.ofHours(presignUrlDuration))
                 .getObjectRequest(getObjectRequest)
                 .build();
 
