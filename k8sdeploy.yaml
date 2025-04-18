@@ -6,20 +6,20 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-hackaton-backend-dep
+  name: app-hct-prc-csm-dep
   namespace: fiap
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app-hackaton-backend
+      app: app-hct-prc-csm
   template:
     metadata:
       labels:
-        app: app-hackaton-backend
+        app: app-hct-prc-csm
     spec:
       containers:
-        - name: app-hackaton-backend
+        - name: app-hct-prc-csm
           image: 913524932573.dkr.ecr.us-east-1.amazonaws.com/file-engine-repo:latest
           ports:
             - name: http
@@ -89,7 +89,7 @@ metadata:
   namespace: fiap
 spec:
   scaleTargetRef:
-    name: app-hackaton-backend-dep
+    name: app-hct-prc-csm-dep
   minReplicaCount: 1
   maxReplicaCount: 10
   pollingInterval: 30

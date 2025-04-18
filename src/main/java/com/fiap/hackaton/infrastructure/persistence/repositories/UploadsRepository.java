@@ -19,7 +19,7 @@ public class UploadsRepository {
 
     }
 
-    public Uploads save(Uploads uploadEntity) {
-        return dynamoDbTemplate.save(uploadEntity);
+    public void save(Uploads uploadEntity) {
+        dynamoDbTemplate.save(uploadEntity);
     }
 }
