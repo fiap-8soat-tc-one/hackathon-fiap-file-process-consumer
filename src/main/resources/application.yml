@@ -1,6 +1,8 @@
 spring:
   profiles:
-    active: prod
+    active: local
+  application:
+    name: file-process-consumer
 app:
   message-broker:
     event:

@@ -31,18 +31,15 @@ public class ScreenshotService {
     private String imageFormat;
 
     public String generate(String fileName) throws Exception {
-        try {
-            String decodedFileName = decodeFileName(fileName);
-            log.info("Decoded file name: {}", decodedFileName);
-            Path videoFile = downloadVideo(decodedFileName);
-            Path zipFile = generateScreenshots(videoFile);
-            String zipUrl = uploadZipFile(zipFile);
-            cleanupVideo(fileName);
-            return zipUrl;
-        } catch (Exception e) {
-            log.error("Error processing video screenshots for file: {}", fileName, e);
-            throw new Exception("Failed to process video screenshots", e);
-        }
+
+        String decodedFileName = decodeFileName(fileName);
+        log.info("Decoded file name: {}", decodedFileName);
+        Path videoFile = downloadVideo(decodedFileName);
+        Path zipFile = generateScreenshots(videoFile);
+        String zipUrl = uploadZipFile(zipFile);
+        cleanupVideo(fileName);
+        return zipUrl;
+
     }
 
     private void cleanupVideo(String fileName) {
