@@ -81,6 +81,19 @@
         </dependency>
 
         <dependency>
+            <groupId>com.thoughtworks.paranamer</groupId>
+            <artifactId>paranamer</artifactId>
+            <version>2.8</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>localstack</artifactId>
             <scope>test</scope>
@@ -94,7 +107,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -133,11 +146,12 @@
                 <version>0.8.12</version>
                 <configuration>
                     <includes>
-                        <include>com/fiap/hackaton/application/usecases/**/*</include>
+                        <include>com/fiap/hackaton/application/usecases/**</include>
                         <include>com/fiap/hackaton/infrastructure/gateways/**</include>
                         <include>com/fiap/hackaton/infrastructure/services/**</include>
                         <include>com/fiap/hackaton/infrastructure/persistence/repositories/**</include>
                         <include>com/fiap/hackaton/infrastructure/presentation/workers/consumers/**</include>
+                        <include>com/fiap/hackaton/infrastructure/utils/**</include>
                     </includes>
                 </configuration>
                 <executions>

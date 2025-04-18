@@ -22,6 +22,7 @@ class ProcessFileUploadUseCaseTest {
     void processFileTest() {
         processFileUploadUseCase.execute("test-key");
         verify(processFileUploadSpec, times(1)).execute(anyString());
+        System.out.println("Test executed successfully");
     }
 
 }

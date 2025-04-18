@@ -18,10 +18,9 @@ public class UploadEventConsumer {
     public void listen(@Payload UploadEventMessage message) {
         log.info("Upload event message received: {}", message);
 
-        message.getRecords().forEach(record -> {
-            var key = record.getS3().getObject().getKey();
-            log.info("file-key: {}", key);
-            processFileUploadUseCase.execute(key);
-        });
+        var key = message.getRecords().getFirst().getS3().getObject().getKey();
+        log.info("file-key: {}", key);
+        processFileUploadUseCase.execute(key);
+
     }
 }
