@@ -1,0 +1,13 @@
+spring:
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region:
+        static: ${AWS_REGION}
+      sqs:
+        endpoint: ${SQS_ENDPOINT}
+      dynamodb:
+        endpoint: ${DYNAMO_DB_ENDPOINT}
+        table-prefix: fiap-hackaton-

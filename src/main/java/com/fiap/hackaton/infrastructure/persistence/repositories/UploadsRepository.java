@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -16,11 +15,8 @@ public class UploadsRepository {
 
     public Optional<Uploads> findById(String id) {
         Key key = Key.builder().partitionValue(id).build();
-        Uploads uploadEntity = dynamoDbTemplate.load(key, Uploads.class);
-        if (Objects.nonNull(uploadEntity)) {
-            return Optional.of(uploadEntity);
-        }
-        return Optional.empty();
+        return Optional.ofNullable(dynamoDbTemplate.load(key, Uploads.class));
+
     }
 
     public void save(Uploads uploadEntity) {
