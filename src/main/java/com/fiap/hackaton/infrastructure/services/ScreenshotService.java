@@ -4,18 +4,14 @@ import com.fiap.hackaton.domain.exceptions.FileProcessException;
 import com.fiap.hackaton.infrastructure.utils.FrameZipUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
-import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Service
@@ -29,9 +25,8 @@ public class ScreenshotService {
     private final String imageFormat;
 
     public ScreenshotService(StorageClientService storageClientService,
-                             @Value("${app.screenshot.total-frames:5}") int totalFrames,
-                             @Value("${app.screenshot.image-format:png}")
-                             String imageFormat) {
+                             @Value("${app.screenshot.total-frames}") int totalFrames,
+                             @Value("${app.screenshot.image-format}") String imageFormat) {
         this.storageClientService = storageClientService;
         this.totalFrames = totalFrames;
         this.imageFormat = imageFormat;

@@ -28,22 +28,27 @@ class UploadEventConsumerTest extends FixtureTest {
 
     @BeforeEach
     void setUp() {
+        // Arrange
         uploadEventMessageMock = Fixture.from(UploadEventMessage.class).gimme("valid");
         uploadEventMessageInvalidMock = Fixture.from(UploadEventMessage.class).gimme("invalid");
     }
 
     @Test
     void dequeueValidMessage() {
+        // Act
         uploadEventConsumer.listen(uploadEventMessageMock);
+        // Assert
         Mockito.verify(processFileUploadUseCaseMock, Mockito.times(1)).execute(Mockito.anyString());
     }
 
     @Test
     void dequeueInvalidMessage() {
+        // Act & Assert
         var assertThrows = assertThrows(NoSuchElementException.class,
                 () -> {
                     uploadEventConsumer.listen(uploadEventMessageInvalidMock);
                 });
+        // Assert
         assertInstanceOf(NoSuchElementException.class, assertThrows);
 
     }

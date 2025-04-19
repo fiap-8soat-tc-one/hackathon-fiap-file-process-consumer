@@ -27,15 +27,20 @@ class UploadsRepositoryTest extends FixtureTest {
 
     @BeforeEach
     void setUp() {
+        // Arrange
         uploadsMock = Fixture.from(Uploads.class).gimme("valid");
     }
 
     @Test
     void findById() {
+        // Arrange
         var id = uploadsMock.getId().toString();
         Mockito.when(dynamoDbTemplateMock.load(Mockito.any(), Mockito.any())).thenReturn(uploadsMock);
+
+        // Act
         var uploads = uploadsRepository.findById(id);
 
+        // Assert
         verify(dynamoDbTemplateMock, Mockito.times(1)).load(Mockito.any(), Mockito.any());
         assertNotNull(uploads);
 
@@ -43,10 +48,14 @@ class UploadsRepositoryTest extends FixtureTest {
 
     @Test
     void notFoundId() {
+        // Arrange
         var id = uploadsMock.getId().toString();
         Mockito.when(dynamoDbTemplateMock.load(Mockito.any(), Mockito.any())).thenReturn(null);
+
+        // Act
         var uploads = uploadsRepository.findById(id);
 
+        // Assert
         verify(dynamoDbTemplateMock, Mockito.times(1)).load(Mockito.any(), Mockito.any());
         assertTrue(uploads.isEmpty());
 
@@ -54,7 +63,9 @@ class UploadsRepositoryTest extends FixtureTest {
 
     @Test
     void save() {
+        // Act
         uploadsRepository.save(uploadsMock);
+        // Assert
         verify(dynamoDbTemplateMock, Mockito.times(1)).save(Mockito.any());
     }
 

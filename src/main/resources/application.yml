@@ -4,6 +4,9 @@ spring:
   application:
     name: file-process-consumer
 app:
+  screenshot:
+    total-frames: 5
+    image-format: png
   message-broker:
     event:
       upload:

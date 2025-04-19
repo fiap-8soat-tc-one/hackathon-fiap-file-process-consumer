@@ -39,23 +39,29 @@ class StorageClientServiceTest {
 
     private StorageClientService storageClientService;
 
-    private final String bucketName = "test-bucket";
-    private final Integer fileTtl = 24;
+    private String bucketName;
+    private Integer fileTtl;
 
     @BeforeEach
     void setUp() {
+        // Arrange
+        bucketName = "test-bucket";
+        fileTtl = 24;
         storageClientService = new StorageClientService(s3ClientMock, s3TemplateMock, s3PresignerMock, bucketName, fileTtl);
     }
 
     @Test
     void downloadReturnsInputStreamWhenFileExists() {
+        // Arrange
         var fileName = "existing-file.txt";
         var inputStreamMock = Mockito.mock(ResponseInputStream.class);
 
         when(s3ClientMock.getObject(Mockito.any(GetObjectRequest.class))).thenReturn(inputStreamMock);
 
+        // Act
         var result = storageClientService.download(fileName);
 
+        // Assert
         assertNotNull(result);
         assertEquals(inputStreamMock, result);
 
@@ -63,19 +69,24 @@ class StorageClientServiceTest {
 
     @Test
     void downloadThrowsS3Exception() {
+        // Arrange
         var fileName = "non-existing-file.txt";
 
         when(s3ClientMock.getObject(Mockito.any(GetObjectRequest.class))).thenThrow(S3Exception.class);
 
+        // Act & Assert
         var assertThrows = Assertions.assertThrows(S3Exception.class, () -> {
             storageClientService.download(fileName);
         });
+
+        // Assert
         assertInstanceOf(S3Exception.class, assertThrows);
 
     }
 
     @Test
     void uploadSuccess() throws MalformedURLException {
+        // Arrange
         var fileName = "file-to-upload.txt";
         var inputStreamMock = Mockito.mock(S3Resource.class);
         var inputStreamFile = Mockito.mock(InputStream.class);
@@ -88,8 +99,10 @@ class StorageClientServiceTest {
         when(s3PresignerMock.presignGetObject(Mockito.any(GetObjectPresignRequest.class)))
                 .thenReturn(presignedGetObjectRequestMock);
 
+        // Act
         var urlPreSignResult = storageClientService.upload(fileName, inputStreamFile, contentType);
 
+        // Assert
         Mockito.verify(s3TemplateMock).upload(anyString(), anyString(), Mockito.any(), Mockito.any());
         Mockito.verify(s3PresignerMock).presignGetObject(Mockito.any(GetObjectPresignRequest.class));
         assertEquals(preSignUrl, urlPreSignResult);
@@ -98,15 +111,19 @@ class StorageClientServiceTest {
 
     @Test
     void uploadLaunchException() {
+        // Arrange
         var fileName = "file-to-upload.txt";
         var inputStreamFile = Mockito.mock(InputStream.class);
         var contentType = "text/plain";
 
         Mockito.doThrow(RuntimeException.class).when(s3TemplateMock).upload(anyString(), anyString(), Mockito.any());
 
+        // Act & Assert
         var assertThrows = Assertions.assertThrows(RuntimeException.class, () -> {
             storageClientService.upload(fileName, inputStreamFile, contentType);
         });
+
+        // Assert
         Assertions.assertInstanceOf(RuntimeException.class, assertThrows);
         Mockito.verify(s3TemplateMock).upload(anyString(), anyString(), Mockito.any(), Mockito.any());
 
@@ -114,11 +131,15 @@ class StorageClientServiceTest {
 
     @Test
     void removeDeletesObjectFromS3() {
+        // Arrange
         var fileName = "file-to-delete.txt";
 
         ArgumentCaptor<Consumer<DeleteObjectRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
 
+        // Act
         storageClientService.remove(fileName);
+
+        // Assert
         Mockito.verify(s3ClientMock).deleteObject(captor.capture());
         DeleteObjectRequest.Builder builder = DeleteObjectRequest.builder();
         captor.getValue().accept(builder);
@@ -132,14 +153,17 @@ class StorageClientServiceTest {
 
     @Test
     void removeDeletesObjectFromS3LaunchS3Exception() {
+        // Arrange
         var fileName = "file-to-delete.txt";
 
         Mockito.doThrow(S3Exception.class).when(s3ClientMock).deleteObject(Mockito.any(Consumer.class));
 
-
+        // Act & Assert
         var assertThrows = Assertions.assertThrows(S3Exception.class, () -> {
             storageClientService.remove(fileName);
         });
+
+        // Assert
         assertInstanceOf(S3Exception.class, assertThrows);
 
     }

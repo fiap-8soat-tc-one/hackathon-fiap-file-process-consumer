@@ -30,16 +30,20 @@ class UploadDbServiceTest extends FixtureTest {
 
     @BeforeEach
     void setUp() {
+        // Arrange
         uploadsMock = Fixture.from(Uploads.class).gimme("valid");
     }
 
     @Test
     void findById() {
+        // Arrange
         var id = uploadsMock.getId().toString();
         Mockito.when(uploadsRepositoryMock.findById(id)).thenReturn(Optional.of(uploadsMock));
 
+        // Act
         var result = uploadDbService.findById(id);
 
+        // Assert
         assertNotNull(result);
         assertEquals(uploadsMock, result);
         Mockito.verify(uploadsRepositoryMock, Mockito.times(1)).findById(id);
@@ -48,12 +52,16 @@ class UploadDbServiceTest extends FixtureTest {
 
     @Test
     void findByIdNotFound() {
+        // Arrange
         var id = uploadsMock.getId().toString();
         Mockito.when(uploadsRepositoryMock.findById(id)).thenReturn(Optional.empty());
 
+        // Act & Assert
         var assertThrows = assertThrows(NotFoundException.class, () -> {
             uploadDbService.findById(id);
         });
+
+        // Assert
         Assertions.assertInstanceOf(NotFoundException.class, assertThrows);
         Mockito.verify(uploadsRepositoryMock, Mockito.times(1)).findById(id);
 
@@ -61,16 +69,19 @@ class UploadDbServiceTest extends FixtureTest {
 
     @Test
     void updateUploadStatus() {
+        // Act
         uploadDbService.updateUploadStatus(uploadsMock, "http://localhost/1234.mp4", UploadStatus.PROCESSED);
+        // Assert
         Mockito.verify(uploadsRepositoryMock, Mockito.times(1)).save(uploadsMock);
     }
 
     @Test
     void updateUploadStatusNullEmptyLink() {
+        // Act
         uploadDbService.updateUploadStatus(uploadsMock, null, UploadStatus.PROCESSED);
-
         uploadDbService.updateUploadStatus(uploadsMock, "", UploadStatus.PROCESSED);
 
+        // Assert
         Mockito.verify(uploadsRepositoryMock, Mockito.times(2)).save(uploadsMock);
     }
 

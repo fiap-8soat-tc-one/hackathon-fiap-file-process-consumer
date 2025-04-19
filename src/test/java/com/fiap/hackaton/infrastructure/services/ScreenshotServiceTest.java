@@ -33,12 +33,15 @@ class ScreenshotServiceTest {
     @Mock
     private StorageClientService storageClientServiceMock;
     private ScreenshotService screenshotService;
-    private final int totalFrames = 5;
-    private final String imageFormat = "png";
+    private int totalFrames;
+    private String imageFormat;
 
     @BeforeEach
     void setUp() {
+        // Arrange
         screenshotService = new ScreenshotService(storageClientServiceMock, totalFrames, imageFormat);
+        totalFrames = 5;
+        imageFormat = "png";
     }
 
     @Test
@@ -88,6 +91,7 @@ class ScreenshotServiceTest {
 
         }
     }
+
     @Test
     void addFrameToZip_WhenNoFrameAvailable() throws Exception {
         // Arrange
@@ -103,6 +107,7 @@ class ScreenshotServiceTest {
         // Assert
         verify(zipOutMock, never()).putNextEntry(any());
     }
+
     @Test
     void addFrameToZip_WhenFrameConversionFails() throws Exception {
         // Arrange
