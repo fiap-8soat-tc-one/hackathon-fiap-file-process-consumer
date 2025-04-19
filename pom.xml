@@ -145,6 +145,7 @@
                         <include>com/fiap/hackaton/infrastructure/services/**</include>
                         <include>com/fiap/hackaton/infrastructure/persistence/repositories/**</include>
                         <include>com/fiap/hackaton/infrastructure/presentation/workers/consumers/**</include>
+                        <include>com/fiap/hackaton/infrastructure/presentation/workers/publishers/**</include>
                         <include>com/fiap/hackaton/infrastructure/utils/**</include>
                     </includes>
                 </configuration>

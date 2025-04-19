@@ -33,15 +33,14 @@ class ScreenshotServiceTest {
     @Mock
     private StorageClientService storageClientServiceMock;
     private ScreenshotService screenshotService;
-    private int totalFrames;
-    private String imageFormat;
 
     @BeforeEach
     void setUp() {
         // Arrange
+        int totalFrames = 5;
+        String imageFormat = "png";
         screenshotService = new ScreenshotService(storageClientServiceMock, totalFrames, imageFormat);
-        totalFrames = 5;
-        imageFormat = "png";
+
     }
 
     @Test
