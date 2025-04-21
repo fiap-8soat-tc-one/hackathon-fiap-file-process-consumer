@@ -33,6 +33,8 @@ spec:
               cpu: "1"
               memory: "2Gi"
           env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
             - name: AWS_DEFAULT_REGION
               value: "us-east-1"
             - name: AWS_REGION

@@ -9,22 +9,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
+import static software.amazon.awssdk.utils.StringUtils.isEmpty;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UploadService {
+public class UploadDbService {
     private final UploadsRepository uploadsRepository;
 
     public Uploads findById(String id) {
         return uploadsRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(format("Upload record not found for id: %s", id)));
+                .orElseThrow(() -> new NotFoundException(format("Upload record not found for id: %s", id)));
     }
 
     public void updateUploadStatus(Uploads upload, String urlDownload, UploadStatus status) {
         upload.setStatus(status.name());
 
-        if(!urlDownload.isEmpty())
+        if (!isEmpty(urlDownload))
             upload.setUrlDownload(urlDownload);
 
         uploadsRepository.save(upload);

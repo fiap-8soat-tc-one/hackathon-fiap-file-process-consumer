@@ -1,38 +1,41 @@
 package com.fiap.hackaton.infrastructure.services;
 
-import lombok.RequiredArgsConstructor;
+import com.fiap.hackaton.domain.exceptions.FileProcessException;
+import com.fiap.hackaton.infrastructure.utils.FrameZipUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
-import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class ScreenshotService {
 
     private final StorageClientService storageClientService;
 
-    @Value("${app.screenshot.total-frames:5}")
-    private int totalFrames;
+    private final int totalFrames;
 
-    @Value("${app.screenshot.image-format:png}")
-    private String imageFormat;
+    private final String imageFormat;
 
-    public String generate(String fileName) throws Exception {
+    public ScreenshotService(StorageClientService storageClientService,
+                             @Value("${app.screenshot.total-frames}") int totalFrames,
+                             @Value("${app.screenshot.image-format}") String imageFormat) {
+        this.storageClientService = storageClientService;
+        this.totalFrames = totalFrames;
+        this.imageFormat = imageFormat;
+    }
+
+    public String generate(String fileName) {
         try {
             String decodedFileName = decodeFileName(fileName);
+            log.info("Decoded file name: {}", decodedFileName);
             Path videoFile = downloadVideo(decodedFileName);
             Path zipFile = generateScreenshots(videoFile);
             String zipUrl = uploadZipFile(zipFile);
@@ -40,7 +43,7 @@ public class ScreenshotService {
             return zipUrl;
         } catch (Exception e) {
             log.error("Error processing video screenshots for file: {}", fileName, e);
-            throw new Exception ("Failed to process video screenshots", e);
+            throw new FileProcessException("Failed to process video screenshots", e);
         }
     }
 
@@ -78,46 +81,13 @@ public class ScreenshotService {
             log.info("Video duration: {} seconds, interval: {} seconds", durationSeconds, intervalSeconds);
 
             for (int i = 0; i < totalFrames; i++) {
-                addFrameToZip(grabber, converter, zipOut, i, intervalSeconds);
+                FrameZipUtil.addFrameToZip(grabber, converter, zipOut, i, intervalSeconds, imageFormat);
             }
 
             zipOut.flush();
         }
 
         return zipFile;
-    }
-
-    private void addFrameToZip(FFmpegFrameGrabber grabber, Java2DFrameConverter converter,
-                               ZipOutputStream zipOut, int frameIndex, int intervalSeconds) throws IOException {
-        long timestampMicros = frameIndex * intervalSeconds * 1_000_000L;
-        grabber.setTimestamp(timestampMicros);
-
-        Frame frame = grabber.grabImage();
-        if (frame == null) {
-            log.warn("No frame available at timestamp: {}", timestampMicros);
-            return;
-        }
-
-        BufferedImage image = converter.convert(frame);
-        if (image == null) {
-            log.warn("Could not convert frame at timestamp: {}", timestampMicros);
-            return;
-        }
-
-        String entryName = String.format("frame_%d.%s", (frameIndex + 1), imageFormat);
-        zipOut.putNextEntry(new ZipEntry(entryName));
-
-        try (ByteArrayOutputStream imgOut = new ByteArrayOutputStream()) {
-            if (!ImageIO.write(image, imageFormat, imgOut)) {
-                log.warn("No writer found for image format: {}", imageFormat);
-                return;
-            }
-            byte[] imageBytes = imgOut.toByteArray();
-            zipOut.write(imageBytes, 0, imageBytes.length);
-        }
-
-        zipOut.closeEntry();
-        log.debug("Added frame to zip: {}", entryName);
     }
 
     private String uploadZipFile(Path zipFile) throws IOException {

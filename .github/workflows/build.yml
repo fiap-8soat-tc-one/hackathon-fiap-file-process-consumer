@@ -42,65 +42,65 @@ jobs:
             -Dsonar.projectKey=fiap-8soat-tc-one_hackathon-fiap-file-process-consumer \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
-  push-ecr:
-    name: Build&Push Image
-    needs: sonar-analysis
-    runs-on: ubuntu-latest
+  # push-ecr:
+  #   name: Build&Push Image
+  #   needs: sonar-analysis
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
+  #     - uses: aws-actions/configure-aws-credentials@v2
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ vars.AWS_REGION }}
 
-      - uses: aws-actions/amazon-ecr-login@v2
-        id: login-ecr
+  #     - uses: aws-actions/amazon-ecr-login@v2
+  #       id: login-ecr
 
-      - name: Create ECR repository if not exists
-        run: |
-          aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} || \
-          aws ecr create-repository --repository-name ${{ env.ECR_REPOSITORY }} || \
-          echo "Repository already exists, continuing..."
+  #     - name: Create ECR repository if not exists
+  #       run: |
+  #         aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} || \
+  #         aws ecr create-repository --repository-name ${{ env.ECR_REPOSITORY }} || \
+  #         echo "Repository already exists, continuing..."
 
-      - name: Build and push Docker image into ECR
-        working-directory: ./
-        run: |
-          VERSION_TAG=$(date +'%Y%m%d').${{ github.run_number }}
+  #     - name: Build and push Docker image into ECR
+  #       working-directory: ./
+  #       run: |
+  #         VERSION_TAG=$(date +'%Y%m%d').${{ github.run_number }}
           
-          docker build \
-            -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest \
-            -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${VERSION_TAG} \
-            --no-cache \
-            .
+  #         docker build \
+  #           -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest \
+  #           -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${VERSION_TAG} \
+  #           --no-cache \
+  #           .
           
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${VERSION_TAG}
+  #         docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+  #         docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${VERSION_TAG}
 
-  deploy-eks:
-    name: Deploy to EKS
-    needs: push-ecr
-    runs-on: ubuntu-latest
-    environment:
-      name: staging
-      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  # deploy-eks:
+  #   name: Deploy to EKS
+  #   needs: push-ecr
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: staging
+  #     url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v2
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Update kube config
-        run: |
-          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+  #     - name: Update kube config
+  #       run: |
+  #         aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
-      - name: Deploy to EKS
-        run: |
-          kubectl apply -f k8sdeploy.yaml
+  #     - name: Deploy to EKS
+  #       run: |
+  #         kubectl apply -f k8sdeploy.yaml
